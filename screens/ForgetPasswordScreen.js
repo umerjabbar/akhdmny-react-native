@@ -1,43 +1,42 @@
 import React from 'react';
 import {
   Image,
+  ImageBackground,
   Platform,
+  ScrollView,
   StyleSheet,
   Text,
+  Button,
   View,
   TouchableOpacity,
   Dimensions,
-  AsyncStorage,
-  TextInput,
+  Share,
+  AsyncStorage
 } from 'react-native';
-
+import { NavigationBarButton } from '../components';
 import Colors from '../constants/Colors'
-import { LinearGradient, Icon } from 'expo';
+import { LinearGradient } from 'expo';
 
-export class SignInScreen extends React.Component {
+export class ForgetPasswordScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
       header: null
     };
   };
 
-  _onPasswordChange(password) {
-    this.password = password;
-  }
-
-  _loginButtonAction() {
+  _loginButtonAction(){
 
   }
-  _ForgetPasswordButtonAction() {
+  _ForgetPasswordButtonAction(){
     const { navigate } = this.props.navigation;
-    navigate('forgetPasswordScreen');
+    navigate()
   }
-  _SkipLoginButtonAction() {
-
+  _SkipLoginButtonAction(){
+    
   }
-  _RegisterNowButtonAction() {
+  _RegisterNowButtonAction(){
     const { navigate } = this.props.navigation;
-    navigate('signupScreen');
+    navigate()
   }
 
   render() {
@@ -54,10 +53,7 @@ export class SignInScreen extends React.Component {
 
           </View>
           <View style={styles.textboxView}>
-            <Icon.EvilIcons name={'lock'} size={30} color={'white'} />
-            <TextInput style={[styles.passwordTextInput]} placeholder={'Password'} keyboardType={'default'}
-              secureTextEntry={true} onChangeText={(password) => this._onPasswordChange(password.replace(/\s/g, ""))}
-              textContentType={'password'} />
+
           </View>
           <TouchableOpacity style={[styles.button, { backgroundColor: 'white' }]} onPress={() => console.log("haskdlj")} activeOpacity={0.8}>
             <Text style={[styles.buttonText, { color: Colors.appTheme }]}>Login</Text>
@@ -71,7 +67,7 @@ export class SignInScreen extends React.Component {
           <TouchableOpacity style={[styles.underlineView]} onPress={() => console.log("haskdlj")} activeOpacity={0.8}>
             <Text style={styles.underlineText}>Register Now</Text>
           </TouchableOpacity>
-          <View style={{ height: Dimensions.get('screen').height * 0.1 }}></View>
+          <View style={{ height: 50 }}></View>
         </View>
       </View>
     );
@@ -101,16 +97,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'white',
     flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 5,
-    padding: 8
-  },
-  passwordTextInput: {
-    height: '100%',
-    width: 260 - 30 - 16 - 5,
-    fontSize: 17,
-    marginStart: 5,
-    color: 'white'
+    marginVertical: 5
   },
   button: {
     alignItems: 'center',

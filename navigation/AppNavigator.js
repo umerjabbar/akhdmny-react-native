@@ -3,7 +3,7 @@ import { createAppContainer, createSwitchNavigator, createStackNavigator } from 
 
 import MainTabNavigator from './MainTabNavigator';
 
-import {SignUpScreen,SplashScreen,SignInScreen, VerificationScreen} from '../screens'
+import {SignUpScreen,SplashScreen,SignInScreen, VerificationScreen, ForgetPasswordScreen} from '../screens'
 
 const LoginStack = createStackNavigator({
   signinScreen: SignInScreen,
@@ -14,6 +14,7 @@ const LoginStack = createStackNavigator({
     }
   },
   verificationScreen: VerificationScreen,
+  forgetPasswordScreen: ForgetPasswordScreen,
 },{
   mode: 'modal',
 });

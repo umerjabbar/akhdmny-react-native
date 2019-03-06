@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Akhdmny User",
-    "slug": "akhdmny_user",
+    "name": "Akhdmny Client",
+    "slug": "akhdmny_client",
     "privacy": "public",
     "sdkVersion": "32.0.0",
     "platforms": [
