@@ -19,7 +19,8 @@
     "react-native-flash-message": "^0.1.10",
     "react-native-side-drawer": "^1.0.9",
     "react-navigation": "^3.0.9",
-    "react-navigation-fluid-transitions": "^0.3.1"
+    "react-navigation-fluid-transitions": "^0.3.1",
+    "react-native-country-picker-modal": "^0.7.1"
   },
   "devDependencies": {
     "babel-preset-expo": "^5.0.0",

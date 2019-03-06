@@ -1,9 +1,21 @@
-let url1 = 'http://52.143.167.81:3000';
-
-var BASEURL = url1;
+let BASEURL = "http://148.251.72.170:8080/akhdmny/public/api";
+let CLIENTURL = "/user";
+let DRIVERURL = "/driver";
+var MIDDLEURL = CLIENTURL;
 
 let LocalConstants = {
-    BASEURL,
+    BASEURL, CLIENTURL, DRIVERURL, MIDDLEURL
 }
 
-export{LocalConstants}
+
+
+let NetworkServices = {
+    Login : "/login",
+    Register : "/register",
+    Verification : "/verification",
+    Logout : "/logout",
+    ForgotPassword : "/forget",
+    UpdateProfile : "/update/profile",
+}
+
+export{LocalConstants, NetworkServices}

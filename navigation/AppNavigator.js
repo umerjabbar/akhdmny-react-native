@@ -7,12 +7,7 @@ import {SignUpScreen,SplashScreen,SignInScreen, VerificationScreen, ForgetPasswo
 
 const LoginStack = createStackNavigator({
   signinScreen: SignInScreen,
-  signupScreen: {
-    screen: SignUpScreen,
-    navigationOptions:{
-      gesturesEnabled: false
-    }
-  },
+  signupScreen: SignUpScreen,
   verificationScreen: VerificationScreen,
   forgetPasswordScreen: ForgetPasswordScreen,
 });

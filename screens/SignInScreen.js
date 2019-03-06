@@ -9,23 +9,102 @@ import {
   Dimensions,
   AsyncStorage,
   TextInput,
+  ActivityIndicator
 } from 'react-native';
 
 import Colors from '../constants/Colors'
-import { LinearGradient, Icon } from 'expo';
+import { LinearGradient, Icon, DangerZone } from 'expo';
+import CountryPicker, { getAllCountries } from 'react-native-country-picker-modal';
+import { showMessage, hideMessage } from 'react-native-flash-message';
+import { Header } from 'react-navigation';
+import { LocalConstants, NetworkServices } from '../constants/Constants'
+
+const { Localization } = DangerZone;
 
 export class SignInScreen extends React.Component {
+
   static navigationOptions = ({ navigation }) => {
     return {
-      header: null
+      headerTintColor: '#ffffff',
+      headerStyle: {
+        backgroundColor: 'transparent',
+        borderBottomColor: 'rgba(255, 255, 255, 0)',
+        ...Platform.select({
+          ios: {},
+          android: {
+            elevation: 0,
+          },
+        }),
+      },
+
+      // headerRight: <NavigationBarButton name={Platform.OS === 'ios' ? 'md-person' : 'md-person'} onPress={navigation.getParam('scanQRCode')} />,
+      // headerLeft: <NavigationBarButton name={Platform.OS === 'ios' ? 'md-qr-scanner' : 'md-qr-scanner'} onPress={() => navigation.navigate('MyModal')} />
+      // header: null
     };
   };
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      cca2: 'SA',
+      phoneBorderColor: 'white',
+      passwordBorderColor: 'white',
+      isSecurePassword: true,
+      isLoading: false,
+      callingCode: '966',
+    };
+    this.countryName = 'Saudi Arabia';
+    this.phone = '';
+    this.password = '';
+  }
+
+  componentDidMount() {
+    this.queryPreferredLocales();
+  }
+
+  queryPreferredLocales = async () => {
+    const currentLocale = await Localization.locale;
+    const locale = String(currentLocale);
+    const data = locale.split("-");
+    if (data === undefined) { return; }
+    if (data[1] === undefined) { return; }
+    const cca2 = data[1];
+    this.setState({ cca2: cca2 });
+    const userCountryData = getAllCountries()
+      .filter(country => country.cca2 === cca2)
+      .pop()
+    if (userCountryData === undefined) { return; }
+    this.countryName = userCountryData.name.common;
+    this.setState({ callingCode: userCountryData.callingCode });
+  };
+
+  _onCountryChange(country) {
+    this.setState({ cca2: country.cca2, callingCode: country.callingCode });
+  }
+  _onPhoneChange(phone) {
+    this.phone = phone;
+  }
   _onPasswordChange(password) {
     this.password = password;
   }
+  _eyeButtonAction(){
+     this.setState({isSecurePassword: !this.state.isSecurePassword})
+  }
 
   _loginButtonAction() {
+    if (this.phone.length == 0 & this.password.length == 0) {
+      this.setState({ phoneBorderColor: 'red', passwordBorderColor: 'red', });
+      showMessage({ message: "Warning", type: 'danger', description: 'Some fields are missing', });
+    } else if (this.phone.length == 0) {
+      this.setState({ phoneBorderColor: 'red', passwordBorderColor: 'white', });
+      showMessage({ message: "Warning", type: 'danger', description: 'Phone field is missing', });
+    } else if (this.password.length == 0) {
+      this.setState({ phoneBorderColor: 'white', passwordBorderColor: 'red', });
+      showMessage({ message: "Warning", type: 'danger', description: 'Password field is missing', });
+    } else {
+      this.setState({ phoneBorderColor: 'white', passwordBorderColor: 'white', });
+      this.lgoinRequest();
+    }
 
   }
   _ForgetPasswordButtonAction() {
@@ -40,6 +119,51 @@ export class SignInScreen extends React.Component {
     navigate('signupScreen');
   }
 
+  async _storeData(key) {
+    try {
+      await AsyncStorage.setItem("access_token", key);
+    } catch (error) {
+      console.log("Error in  persisting asyncstorage key")
+    }
+  }
+
+  async lgoinRequest() {
+    this.setState({ isLoading: true });
+    return fetch(`${LocalConstants.BASEURL}${LocalConstants.MIDDLEURL}${NetworkServices.Login}`, {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json",
+        "client-id": "akhdmny-app-ios",
+        "Authorization": "Basic YWhsYW0tYXBwLWlvczo1Nzk3ZTY2Mi0wYzQ0LTRjYWYtOGU1OS01OGUwNzVjOWI3NGI="
+      },
+      body: JSON.stringify({
+        phone: `+${this.state.callingCode}${this.phone}`,
+        password: this.password,
+        country: this.countryName
+      }),
+    }).then((response) => {
+      this.setState({ isLoading: false });
+      if (response.status == 500 || response.status == 404) {
+        showMessage({ message: "Error", type: 'danger', description: `Error connecting server with response code of ${response.status}`, });
+        return;
+      }
+      response.json().then(responseJson => {
+        if (response.status >= 200, response.status <= 300) {
+          // this._storeData(responseJson.access_token)
+          const { navigate } = this.props.navigation;
+          navigate('App');
+        } else {
+          showMessage({ message: "Error", type: 'danger', description: "responseJson.error.message", });
+        }
+      }).catch(error => {
+        showMessage({ message: "Parse Error", type: 'danger', description: "Error in json parsing it is caused by server", });
+      })
+    }).catch((error) => {
+      this.setState({ isLoading: false });
+      showMessage({ message: "Failure", type: 'danger', description: "Internet Connection lost", });
+    });
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -50,20 +174,31 @@ export class SignInScreen extends React.Component {
             style={styles.logoImage} resizeMode={'cover'}
           />
           <Text style={{ color: 'white', fontSize: 18, marginVertical: 10 }}>LOGIN TO YOUR ACCOUNT</Text>
-          <View style={styles.textboxView}>
-
+          <View style={[styles.textboxView, { borderColor: this.state.phoneBorderColor }]}>
+            <View style={{ width: 30, top: -3 }}>
+              <CountryPicker
+                onChange={(country) => this._onCountryChange(country)}
+                cca2={this.state.cca2 || 'SA'} translation='eng' />
+            </View>
+            <Text style={styles.codeStyle}>{`+${this.state.callingCode}`}</Text>
+            <TextInput style={[styles.phoneTextInput]} placeholder={'Phone'} keyboardType={'phone-pad'}
+              onChangeText={(phone) => this._onPhoneChange(phone.replace(/\s/g, ""))}
+              textContentType={'telephoneNumber'} placeholderTextColor={'#D4D4D4'} />
           </View>
-          <View style={styles.textboxView}>
+          <View style={[styles.textboxView, { borderColor: this.state.passwordBorderColor }]}>
             <Icon.EvilIcons name={'lock'} size={30} color={'white'} />
             <TextInput style={[styles.passwordTextInput]} placeholder={'Password'} keyboardType={'default'}
-              secureTextEntry={true} onChangeText={(password) => this._onPasswordChange(password.replace(/\s/g, ""))}
-              textContentType={'password'} />
+              secureTextEntry={this.state.isSecurePassword} onChangeText={(password) => this._onPasswordChange(password.replace(/\s/g, ""))}
+              textContentType={'password'} placeholderTextColor={'#D4D4D4'} />
+            <TouchableOpacity onPress={() => this._eyeButtonAction()} activeOpacity={0.6}>
+              <Icon.Foundation name={'eye'} size={30} color={'white'} />
+            </TouchableOpacity>
           </View>
           <TouchableOpacity style={[styles.button, { backgroundColor: 'white' }]} onPress={() => this._loginButtonAction()} activeOpacity={0.8}>
             <Text style={[styles.buttonText, { color: Colors.appTheme }]}>Login</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.underlineView]} onPress={() => this._ForgetPasswordButtonAction()} activeOpacity={0.8}>
-            <Text style={styles.underlineText}>Forget Password?</Text>
+            <Text style={styles.underlineText}>Forgot Password?</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.underlineView]} onPress={() => this._SkipLoginButtonAction()} activeOpacity={0.8}>
             <Text style={styles.underlineText}>Skip Login</Text>
@@ -71,8 +206,13 @@ export class SignInScreen extends React.Component {
           <TouchableOpacity style={[styles.underlineView]} onPress={() => this._RegisterNowButtonAction()} activeOpacity={0.8}>
             <Text style={styles.underlineText}>Register Now</Text>
           </TouchableOpacity>
-          <View style={{ height: Dimensions.get('screen').height * 0.1 }}></View>
+          <View style={{ height: Header.HEIGHT + Dimensions.get('screen').height * 0.05 }}></View>
         </View>
+        {this.state.isLoading && <View style={[{ alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.3)' }, styles.backgroundImage]}>
+          <View style={{ height: 100, width: 100, alignItems: 'center', justifyContent: 'center', backgroundColor: 'white', borderRadius: 10 }}>
+            <ActivityIndicator size="large" color="#0000ff" style={{ position: 'absolute' }} />
+          </View>
+        </View>}
       </View>
     );
   }
@@ -99,18 +239,29 @@ const styles = StyleSheet.create({
     width: 260,
     borderRadius: 5,
     borderWidth: 1,
-    borderColor: 'white',
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 5,
     padding: 8
   },
+  codeStyle: {
+    fontSize: 17,
+    color: 'white',
+    marginStart: 10
+  },
+  phoneTextInput: {
+    height: '100%',
+    width: 260 - 30 - 16 - 5 - 30,
+    fontSize: 17,
+    color: 'white',
+    marginStart: 5,
+  },
   passwordTextInput: {
     height: '100%',
-    width: 260 - 30 - 16 - 5,
+    width: 260 - 30 - 16 - 5 - 30,
     fontSize: 17,
     marginStart: 5,
-    color: 'white'
+    color: 'white',
   },
   button: {
     alignItems: 'center',
@@ -130,7 +281,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     padding: 5,
     fontSize: 16,
-    color: 'white'
+    color: 'white',
   },
   underlineView: {
     alignItems: 'center',
