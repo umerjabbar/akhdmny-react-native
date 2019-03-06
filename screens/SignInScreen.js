@@ -59,16 +59,16 @@ export class SignInScreen extends React.Component {
               secureTextEntry={true} onChangeText={(password) => this._onPasswordChange(password.replace(/\s/g, ""))}
               textContentType={'password'} />
           </View>
-          <TouchableOpacity style={[styles.button, { backgroundColor: 'white' }]} onPress={() => console.log("haskdlj")} activeOpacity={0.8}>
+          <TouchableOpacity style={[styles.button, { backgroundColor: 'white' }]} onPress={() => this._loginButtonAction()} activeOpacity={0.8}>
             <Text style={[styles.buttonText, { color: Colors.appTheme }]}>Login</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.underlineView]} onPress={() => console.log("haskdlj")} activeOpacity={0.8}>
+          <TouchableOpacity style={[styles.underlineView]} onPress={() => this._ForgetPasswordButtonAction()} activeOpacity={0.8}>
             <Text style={styles.underlineText}>Forget Password?</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.underlineView]} onPress={() => console.log("haskdlj")} activeOpacity={0.8}>
+          <TouchableOpacity style={[styles.underlineView]} onPress={() => this._SkipLoginButtonAction()} activeOpacity={0.8}>
             <Text style={styles.underlineText}>Skip Login</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.underlineView]} onPress={() => console.log("haskdlj")} activeOpacity={0.8}>
+          <TouchableOpacity style={[styles.underlineView]} onPress={() => this._RegisterNowButtonAction()} activeOpacity={0.8}>
             <Text style={styles.underlineText}>Register Now</Text>
           </TouchableOpacity>
           <View style={{ height: Dimensions.get('screen').height * 0.1 }}></View>

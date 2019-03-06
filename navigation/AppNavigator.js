@@ -15,8 +15,6 @@ const LoginStack = createStackNavigator({
   },
   verificationScreen: VerificationScreen,
   forgetPasswordScreen: ForgetPasswordScreen,
-},{
-  mode: 'modal',
 });
 
 export default createAppContainer(createSwitchNavigator({
