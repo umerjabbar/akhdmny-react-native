@@ -92,18 +92,22 @@ export class ForgetPasswordScreen extends React.Component {
   }
 
   _loginButtonAction() {
-    if (this.phone.length == 0 & this.password.length == 0) {
-      this.setState({ phoneBorderColor: 'red', passwordBorderColor: 'red', });
-      showMessage({ message: "Warning", type: 'danger', description: 'Some fields are missing', });
-    } else if (this.phone.length == 0) {
+    // if (this.phone.length == 0 & this.password.length == 0) {
+    //   this.setState({ phoneBorderColor: 'red', passwordBorderColor: 'red', });
+    //   showMessage({ message: "Warning", type: 'danger', description: 'Some fields are missing', });
+    // } 
+    // else 
+    if (this.phone.length == 0) {
       this.setState({ phoneBorderColor: 'red', passwordBorderColor: 'white', });
       showMessage({ message: "Warning", type: 'danger', description: 'Phone field is missing', });
-    } else if (this.password.length == 0) {
-      this.setState({ phoneBorderColor: 'white', passwordBorderColor: 'red', });
-      showMessage({ message: "Warning", type: 'danger', description: 'Password field is missing', });
-    } else {
+    } 
+    // else if (this.password.length == 0) {
+    //   this.setState({ phoneBorderColor: 'white', passwordBorderColor: 'red', });
+    //   showMessage({ message: "Warning", type: 'danger', description: 'Password field is missing', });
+    // } 
+    else {
       this.setState({ phoneBorderColor: 'white', passwordBorderColor: 'white', });
-      this.lgoinRequest();
+      this.forgotPassword();
     }
 
   }
@@ -127,7 +131,7 @@ export class ForgetPasswordScreen extends React.Component {
     }
   }
 
-  async lgoinRequest() {
+  async forgotPasswordRequest() {
     this.setState({ isLoading: true });
     return fetch(`${LocalConstants.BASEURL}${LocalConstants.MIDDLEURL}${NetworkServices.ForgotPassword}`, {
       method: 'POST',
@@ -138,8 +142,6 @@ export class ForgetPasswordScreen extends React.Component {
       },
       body: JSON.stringify({
         phone: `+${this.state.callingCode}${this.phone}`,
-        password: this.password,
-        country: this.countryName
       }),
     }).then((response) => {
       this.setState({ isLoading: false });

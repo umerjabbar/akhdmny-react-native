@@ -197,13 +197,13 @@ export class SignInScreen extends React.Component {
           <TouchableOpacity style={[styles.button, { backgroundColor: 'white' }]} onPress={() => this._loginButtonAction()} activeOpacity={0.8}>
             <Text style={[styles.buttonText, { color: Colors.appTheme }]}>Login</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.underlineView]} onPress={() => this._ForgetPasswordButtonAction()} activeOpacity={0.8}>
+          <TouchableOpacity style={[styles.underlineView]} onPress={() => this._ForgetPasswordButtonAction()} activeOpacity={0.6}>
             <Text style={styles.underlineText}>Forgot Password?</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.underlineView]} onPress={() => this._SkipLoginButtonAction()} activeOpacity={0.8}>
+          <TouchableOpacity style={[styles.underlineView]} onPress={() => this._SkipLoginButtonAction()} activeOpacity={0.6}>
             <Text style={styles.underlineText}>Skip Login</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.underlineView]} onPress={() => this._RegisterNowButtonAction()} activeOpacity={0.8}>
+          <TouchableOpacity style={[styles.underlineView]} onPress={() => this._RegisterNowButtonAction()} activeOpacity={0.6}>
             <Text style={styles.underlineText}>Register Now</Text>
           </TouchableOpacity>
           <View style={{ height: Header.HEIGHT + Dimensions.get('screen').height * 0.05 }}></View>

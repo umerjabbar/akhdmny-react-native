@@ -130,7 +130,7 @@ export class SignUpScreen extends React.Component {
   async lgoinRequest() {
     this.setState({ isLoading: true });
     return fetch(`${LocalConstants.BASEURL}${LocalConstants.MIDDLEURL}${NetworkServices.Register}`, {
-      method: 'POST',
+      method: 'PUT',
       headers: {
         "Content-Type": "application/json",
         "client-id": "akhdmny-app-ios",
@@ -151,8 +151,9 @@ export class SignUpScreen extends React.Component {
         if (response.status >= 200, response.status <= 300) {
           // this._storeData(responseJson.access_token)
           const { navigate } = this.props.navigation;
-          navigate('App');
+          navigate('verificationScreen', { phone: `+${this.state.callingCode}${this.phone}`});
         } else {
+          console.log(responseJson)
           showMessage({ message: "Error", type: 'danger', description: "responseJson.error.message", });
         }
       }).catch(error => {

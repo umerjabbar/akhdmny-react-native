@@ -1,52 +1,219 @@
 import React from 'react';
 import {
   Image,
-  ImageBackground,
   Platform,
-  ScrollView,
   StyleSheet,
   Text,
-  Button,
   View,
   TouchableOpacity,
   Dimensions,
-  Share,
-  AsyncStorage
+  AsyncStorage,
+  TextInput,
+  ActivityIndicator
 } from 'react-native';
-import { ExpoConfigView } from '@expo/samples';
-import {NavigationBarButton} from '../components';
-import Colors from '../constants/Colors';
-import { LinearGradient } from 'expo';
+import Colors from '../constants/Colors'
+import { LinearGradient, Icon, DangerZone } from 'expo';
+import CountryPicker, { getAllCountries } from 'react-native-country-picker-modal';
+import { showMessage, hideMessage } from 'react-native-flash-message';
+import { Header } from 'react-navigation';
+import { LocalConstants, NetworkServices } from '../constants/Constants'
+import { NavigationBarButton } from '../components';
+import CodeInput from 'react-native-confirmation-code-field';
+
+const { Localization } = DangerZone;
 
 export class VerificationScreen extends React.Component {
+
   static navigationOptions = ({ navigation }) => {
     return {
-      title: 'VERIFICATION',
       headerTintColor: '#ffffff',
       headerStyle: {
         backgroundColor: 'transparent',
-        borderBottomColor: 'rgba(0, 0, 0, 0.2)',
+        borderBottomColor: 'rgba(255, 255, 255, 0)',
         ...Platform.select({
           ios: {},
           android: {
-            elevation: 1,
+            elevation: 0,
           },
         }),
       },
 
-      headerRight: <NavigationBarButton name={Platform.OS === 'ios' ? 'ios-exit' : 'md-exit'} onPress={() => { AsyncStorage.removeItem("access_token"); navigation.navigate('Auth')}} />,
-      // headerLeft: <NavigationBarButton name={Platform.OS === 'ios' ? 'md-qr-scanner' : 'md-qr-scanner'} onPress={() => navigation.navigate('Scanner')} />
+      // headerRight: <NavigationBarButton name={Platform.OS === 'ios' ? 'md-person' : 'md-person'} onPress={navigation.getParam('scanQRCode')} />,
+      headerLeft: <NavigationBarButton name={'ios-arrow-back'} onPress={() => navigation.pop()} />
       // header: null
     };
   };
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      cca2: 'SA',
+      phoneBorderColor: 'white',
+      passwordBorderColor: 'white',
+      isSecurePassword: true,
+      isLoading: false,
+      isVerified: false,
+      callingCode: '966',
+    };
+    this.countryName = 'Saudi Arabia';
+    this.phone = '';
+    this.password = '';
+    this.code = '';
+  }
+
+  componentDidMount() {
+    this.queryPreferredLocales();
+    this.phone = this.props.phone;
+  }
+
+  queryPreferredLocales = async () => {
+    const currentLocale = await Localization.locale;
+    const locale = String(currentLocale);
+    const data = locale.split("-");
+    if (data === undefined) { return; }
+    if (data[1] === undefined) { return; }
+    const cca2 = data[1];
+    this.setState({ cca2: cca2 });
+    const userCountryData = getAllCountries()
+      .filter(country => country.cca2 === cca2)
+      .pop()
+    if (userCountryData === undefined) { return; }
+    this.countryName = userCountryData.name.common;
+    this.setState({ callingCode: userCountryData.callingCode });
+  };
+
+  _onCountryChange(country) {
+    this.setState({ cca2: country.cca2, callingCode: country.callingCode });
+  }
+  _onPhoneChange(phone) {
+    this.phone = phone;
+  }
+  _onPasswordChange(password) {
+    this.password = password;
+  }
+  _eyeButtonAction() {
+    this.setState({ isSecurePassword: !this.state.isSecurePassword })
+  }
+
+  _loginButtonAction() {
+    if (this.code.length == 0) {
+      showMessage({ message: "Error", type: 'danger', description: 'Code field is missing', });
+    } else {
+      this.setState({ phoneBorderColor: 'white', passwordBorderColor: 'white', });
+      this.VerificationRequest();
+    }
+  }
+
+  _handlerOnFulfill(code) {
+    console.log(code);
+    this.code = code;
+  }
+
+  _ForgetPasswordButtonAction() {
+    const { navigate } = this.props.navigation;
+    navigate('forgetPasswordScreen');
+  }
+  _SkipLoginButtonAction() {
+
+  }
+  _RegisterNowButtonAction() {
+    const { navigate } = this.props.navigation;
+    navigate('signupScreen');
+  }
+
+  async _storeData(key) {
+    try {
+      await AsyncStorage.setItem("access_token", key);
+    } catch (error) {
+      console.log("Error in  persisting asyncstorage key")
+    }
+  }
+
+  async VerificationRequest() {
+    this.setState({ isLoading: true });
+    return fetch(`${LocalConstants.BASEURL}${LocalConstants.MIDDLEURL}${NetworkServices.Verification}`, {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json",
+        "client-id": "akhdmny-app-ios",
+        "Authorization": "Basic YWhsYW0tYXBwLWlvczo1Nzk3ZTY2Mi0wYzQ0LTRjYWYtOGU1OS01OGUwNzVjOWI3NGI="
+      },
+      body: JSON.stringify({
+        phone: `${this.phone}`,
+        code: this.code,
+      }),
+    }).then((response) => {
+      this.setState({ isLoading: false });
+      if (response.status == 500 || response.status == 404) {
+        showMessage({ message: "Error", type: 'danger', description: `Error connecting server with response code of ${response.status}`, });
+        return;
+      }
+      response.json().then(responseJson => {
+        if (response.status >= 200, response.status <= 300) {
+          // this._storeData(responseJson.access_token)
+          const { navigate } = this.props.navigation;
+          navigate('App');
+        } else {
+          showMessage({ message: "Error", type: 'danger', description: "responseJson.error.message", });
+        }
+      }).catch(error => {
+        showMessage({ message: "Parse Error", type: 'danger', description: "Error in json parsing it is caused by server", });
+      })
+    }).catch((error) => {
+      this.setState({ isLoading: false });
+      showMessage({ message: "Failure", type: 'danger', description: "Internet Connection lost", });
+    });
+  }
+
   render() {
-    /* Go ahead and delete ExpoConfigView and replace it with your
-     * content, we just wanted to give you a quick view of your config */
     return (
       <View style={styles.container}>
-        {/* <LinearGradient colors={[Colors.backColor1, Colors.backColor2, Colors.backColor3]} style={styles.backgroundImage}></LinearGradient> */}
-        <ExpoConfigView />
+        <LinearGradient colors={[Colors.appTheme, Colors.appTheme, Colors.appTheme]} style={styles.backgroundImage}></LinearGradient>
+        <View style={{ alignItems: 'center', flex: 1, justifyContent: 'center' }}>
+        {this.state.isVerified && <Icon.Ionicons name={'ios-checkmark-circle'} size={Dimensions.get('screen').height * 0.3} color={'#7CFC00'} />}
+
+          <Text style={{ color: 'white', fontSize: 18, marginVertical: 10, }}>PLEASE ENTER THE VERIFICATION CODE HERE</Text>
+          
+          <View style={[styles.textboxView]}>
+          {/* <View style={{ width: 30, top: -3 }}>
+              <CountryPicker
+                onChange={(country) => this._onCountryChange(country)}
+                cca2={this.state.cca2 || 'SA'} translation='eng' />
+            </View>
+            <Text style={styles.codeStyle}>{`+${this.state.callingCode}`}</Text>
+            <TextInput style={[styles.phoneTextInput]} placeholder={'Phone'} keyboardType={'phone-pad'}
+              onChangeText={(phone) => this._onPhoneChange(phone.replace(/\s/g, ""))}
+              textContentType={'telephoneNumber'} placeholderTextColor={'#D4D4D4'} /> */}
+              <CodeInput style={{ height: 70 }} onFulfill={this._handlerOnFulfill.bind(this)} keyboardType="numeric" size={60} codeLength={4} />
+          </View>
+          {/* <View style={[styles.textboxView, { borderColor: this.state.passwordBorderColor }]}>
+            <Icon.EvilIcons name={'lock'} size={30} color={'white'} />
+            <TextInput style={[styles.passwordTextInput]} placeholder={'Password'} keyboardType={'default'}
+              secureTextEntry={this.state.isSecurePassword} onChangeText={(password) => this._onPasswordChange(password.replace(/\s/g, ""))}
+              textContentType={'password'} placeholderTextColor={'#D4D4D4'} />
+            <TouchableOpacity onPress={() => this._eyeButtonAction()} activeOpacity={0.6}>
+              <Icon.Foundation name={'eye'} size={30} color={'white'} />
+            </TouchableOpacity>
+          </View> */}
+          <TouchableOpacity style={[styles.button, { backgroundColor: 'white' }]} onPress={() => this._loginButtonAction()} activeOpacity={0.8}>
+            <Text style={[styles.buttonText, { color: Colors.appTheme }]}>Verification</Text>
+          </TouchableOpacity>
+          <View style={[styles.underlineView]}>
+            <Text style={styles.underlineText}>Forget Password?</Text>
+          </View>
+          <View style={[styles.underlineView]}>
+            <Text style={styles.underlineText}>Skip Login</Text>
+          </View>
+          <View style={[styles.underlineView]}>
+            <Text style={styles.underlineText}>Register Now</Text>
+          </View>
+          <View style={{ height: Header.HEIGHT + Dimensions.get('screen').height * 0.05 }}></View>
+        </View>
+        {this.state.isLoading && <View style={[{ alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.3)' }, styles.backgroundImage]}>
+          <View style={{ height: 100, width: 100, alignItems: 'center', justifyContent: 'center', backgroundColor: 'white', borderRadius: 10 }}>
+            <ActivityIndicator size="large" color="#0000ff" style={{ position: 'absolute' }} />
+          </View>
+        </View>}
       </View>
     );
   }
@@ -63,5 +230,65 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: '100%',
     height: Dimensions.get('screen').height
+  },
+  logoImage: {
+    height: Dimensions.get('screen').height * 0.3,
+    width: Dimensions.get('screen').height * 0.3,
+  },
+  textboxView: {
+    height: 60,
+    width: 260,
+    borderRadius: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 5,
+    padding: 8
+  },
+  codeStyle: {
+    fontSize: 17,
+    color: 'white',
+    marginStart: 10
+  },
+  phoneTextInput: {
+    height: '100%',
+    width: 260 - 30 - 16 - 5 - 30,
+    fontSize: 17,
+    color: 'white',
+    marginStart: 5,
+  },
+  passwordTextInput: {
+    height: '100%',
+    width: 260 - 30 - 16 - 5 - 30,
+    fontSize: 17,
+    marginStart: 5,
+    color: 'white',
+  },
+  button: {
+    alignItems: 'center',
+    marginHorizontal: 15,
+    marginVertical: 10,
+    height: 50,
+    borderRadius: 5,
+    justifyContent: 'center',
+    width: 240,
+  },
+  buttonText: {
+    textAlign: 'center',
+    padding: 8,
+    fontSize: 18,
+  },
+  underlineText: {
+    textAlign: 'center',
+    padding: 5,
+    fontSize: 16,
+    color: 'transparent',
+  },
+  underlineView: {
+    alignItems: 'center',
+    marginHorizontal: 5,
+    marginVertical: 5,
+    height: 25,
+    justifyContent: 'center',
+    width: 200,
   },
 });
