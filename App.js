@@ -2,6 +2,7 @@ import React from 'react';
 import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import { AppLoading, Asset, Font, Icon } from 'expo';
 import AppNavigator from './navigation/AppNavigator';
+import FlashMessage from "react-native-flash-message";
 
 export default class App extends React.Component {
   state = {
@@ -22,6 +23,7 @@ export default class App extends React.Component {
         <View style={styles.container}>
           {Platform.OS === 'ios' && <StatusBar barStyle="light-content" />}
           <AppNavigator />
+          <FlashMessage position='center' animated={true} />
         </View>
       );
     }

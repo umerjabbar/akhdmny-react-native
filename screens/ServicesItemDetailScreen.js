@@ -41,6 +41,7 @@ export class ServicesItemDetailScreen extends React.Component {
             audioIcon: 'ios-mic',
             haveRecordingPermissions: false,
         };
+        this.isPlaying = false;
         this.isAudioAdded = false;
         this.recording = null;
         this.sound = null;
@@ -66,7 +67,7 @@ export class ServicesItemDetailScreen extends React.Component {
     _audioButtonTapped() {
         console.log('_audioButtonTapped');
         if (this.sound != null) {
-            if (this.state.isPlaying) {
+            if (this.isPlaying) {
                 this.sound.stopAsync();
                 this.setState({ 'audioIcon': 'ios-play' });
             } else {
@@ -83,7 +84,6 @@ export class ServicesItemDetailScreen extends React.Component {
                 this._stopRecordingAndEnablePlayback();
             }
         }
-
         if (this.sound !== null) {
             this.setState({ 'audioIcon': 'ios-play' });
         } else {
@@ -159,26 +159,30 @@ export class ServicesItemDetailScreen extends React.Component {
         const { sound, status } = await this.recording.createNewLoadedSoundAsync({
             isLooping: false,
         },this._updateScreenForSoundStatus);
+        sound.setOnPlaybackStatusUpdate(this._playbackSoundStatus)
         this.sound = sound;
         this.setState({ 'audioIcon': 'ios-play' });
     }
 
     _updateScreenForSoundStatus = status => {
         if (status.isLoaded) {
-            this.setState({isPlaying: status.isPlaying,});
+            // this.setState({isPlaying: status.isPlaying,});
         } else {
+            // console.log(`Audio played stopped`);
             if (status.error) {
                 console.log(`FATAL PLAYER ERROR: ${status.error}`);
             }
         }
     };
 
-    _onPlayPausePressed = () => {
-        if (this.sound != null) {
-            if (this.state.isPlaying) {
-                this.sound.pauseAsync();
-            } else {
-                this.sound.playAsync();
+    _playbackSoundStatus = status => {
+        this.isPlaying = status.isPlaying;
+        if (status.isPlaying) {
+
+        } else {
+            if (this.sound != null) {
+                this.sound.stopAsync();
+                this.setState({ 'audioIcon': 'ios-play' });
             }
         }
     };

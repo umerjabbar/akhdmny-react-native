@@ -14,24 +14,24 @@ import {
   ServicesItemDetailScreen
 } from '../screens';
 
-const ServicesStackScreen = createStackNavigator({
-  screen: ServicesScreen
-});
+// const ServicesStackScreen = createStackNavigator({
+//   screen: ServicesScreen
+// });
 
-const ServicesItemsStackScreen = createStackNavigator({
-  screen: ServicesItemsScreen,
-  ServicesItemDetail: ServicesItemDetailScreen
-}, {
-  mode: 'modal',
-  headerMode: 'float'
-});
+// const ServicesItemsStackScreen = createStackNavigator({
+//   screen: ServicesItemsScreen,
+//   ServicesItemDetail: ServicesItemDetailScreen
+// }, {
+//   mode: 'modal',
+//   headerMode: 'float'
+// });
 
-const ServicesItemDetailStackScreen = createStackNavigator({
-  screen: ServicesItemDetailScreen
-}, {
-  mode: 'modal',
-  headerMode: 'none'
-});
+// const ServicesItemDetailStackScreen = createStackNavigator({
+//   screen: ServicesItemDetailScreen
+// }, {
+//   mode: 'modal',
+//   headerMode: 'none'
+// });
 
 const ServicesStack = createStackNavigator({
   Main: ServicesScreen,
