@@ -15,10 +15,10 @@ import { NavigationBarButton } from '../components';
 import Colors from '../constants/Colors';
 import { Transition } from 'react-navigation-fluid-transitions';
 
-export class ServicesItemsScreen extends React.Component {
+export class CartScreen extends React.Component {
     static navigationOptions = ({ navigation }) => {
         return {
-            title: 'SERVICES',
+            title: 'CART',
             headerTintColor: '#ffffff',
             headerStyle: {
                 backgroundColor: Colors.appTheme,
@@ -31,7 +31,7 @@ export class ServicesItemsScreen extends React.Component {
                 }),
             },
 
-            headerRight: <NavigationBarButton name={Platform.OS === 'ios' ? 'md-cart' : 'md-cart'} onPress={() => navigation.navigate('Cart')} />,
+            // headerRight: <NavigationBarButton name={Platform.OS === 'ios' ? 'md-cart' : 'md-cart'} onPress={() => navigation.navigate('Map')} />,
             headerLeft: <NavigationBarButton name={Platform.OS === 'ios' ? 'ios-arrow-back' : 'ios-arrow-back'} onPress={() => navigation.pop()} />
             // header: null
         };
@@ -46,13 +46,13 @@ export class ServicesItemsScreen extends React.Component {
     }
 
     makeSections() {
-        for (let index = 0; index < 10; index++) {
+        for (let index = 0; index < 2; index++) {
             this.state.items.push({
                 id: `${index}`,
                 title: 'Managment Team',
                 color: 'white',
                 price: `${index * 173} PKR`,
-                address: 'sdjafhjkasfdhjhsagda gsdas gdkg asdg sadg isugdsa igd asgdksag dasg asjdg kjasg djkkasdhf',
+                address: 'sdjafhjkasfdhjhsagda gsdas gdkg asdg sadg isugdsa igd',
                 icon: `https:\/\/theappsolutions.com\/images\/articles\/source\/restaurant-app\/tumvi-logo.png`,
             })
         }
@@ -65,13 +65,6 @@ export class ServicesItemsScreen extends React.Component {
     render() {
         return (
             <View style={styles.container}>
-                <View style={styles.upperViewContainer}>
-                    {/* <Transition shared={`image${this.props.navigation.state.params.index}`}> */}
-                        <Image style={{ height: 40, width: 40, borderRadius: 20, backgroundColor: 'white', marginHorizontal: 6 }}
-                            source={{ uri: this.props.navigation.state.params.item.icon }}></Image>
-                    {/* </Transition> */}
-                    <Text style={styles.screenHeaderText}>{this.props.navigation.state.params.item.title}</Text>
-                </View>
                 <FlatList
                     style={styles.flatContainer}
                     data={this.state.items}
@@ -79,6 +72,7 @@ export class ServicesItemsScreen extends React.Component {
                     keyExtractor={(item, index) => item.id}
                     numColumns={1}
                     ListHeaderComponent={this.renderHeader}
+                    ListFooterComponent={this.renderFooter}
                     ItemSeparatorComponent={this.renderSeparator}
                 />
             </View>
@@ -111,28 +105,48 @@ export class ServicesItemsScreen extends React.Component {
 
     renderHeader = () => {
         return (
-            <View style={{ borderBottomWidth: 1, borderBottomColor: '#CED0CE' }}>
-                <View style={styles.searchInput}>
-                    <TextInput
-                        style={styles.inputText}
-                        placeholder={'Enter Place'}
-                        placeholderTextColor={'#999'}
-                        underlineColorAndroid={'#fff'}
-                        autoCorrect={false}
-                        onFocus={() => {
-                            // this.props.changeInputFocus('search');
-                        }}
-                        ref={(inputSearch) => {
-                            this.inputSearch = inputSearch;
-                        }}
-                    />
-                    <TouchableOpacity
-                        style={styles.button} onPress={() => this.props.navigation.navigate('Services')}
-                        activeOpacity={0.6} >
-                        <Text style={styles.buttonText}>Search</Text>
-                    </TouchableOpacity>
+            <View style={{ marginBottom: 5 }}>
+                <View style={[styles.upperViewContainer, { paddingHorizontal: 8, }]}>
+                    <Icon.MaterialCommunityIcons name={'tag-plus'} size={25} color={'black'} />
+                    <Text style={styles.screenHeaderText}>{'Have Coupon ?'}</Text>
+                    <Icon.Ionicons style={{ position: 'absolute', end: 10 }} name={'ios-arrow-forward'} size={25} color={'black'} />
+                </View>
+            </View>
+        );
+    }
+
+    renderFooter = () => {
+        return (
+            <View style={{ marginTop: 5 }}>
+                <View style={styles.footerViewContainer}>
+                    <View style={[styles.footerSection, { backgroundColor: "#31B2F5" }]}>
+                        {/* <Icon.FontAwesome name={'money'} size={25} color={'black'} /> */}
+                        <Text style={styles.footerSectionTitle}>{'Add Tip'}</Text>
+                    </View>
+                    <Text style={[styles.screenHeaderText, {marginHorizontal: 5}]}>{'Enter amount'}</Text>
+                    <Icon.Ionicons style={{ position: 'absolute', end: 40 }} name={'ios-arrow-forward'} size={20} color={'black'} />
+                    <Text style={[styles.screenHeaderText, {position: 'absolute', end: 12}]}>{'12'}</Text>
+                </View>
+                <View style={styles.footerViewContainer}>
+                    <View style={[styles.footerSection, { backgroundColor: "#1266B3" }]}>
+                        <Text style={styles.footerSectionTitle}>{'Total Services'}</Text>
+                    </View>
+                    <Text style={styles.footerSectionValue}>{'4'}</Text>
+                </View>
+                <View style={styles.footerViewContainer}>
+                    <View style={[styles.footerSection, { backgroundColor: "#EDB61A" }]}>
+                        <Text style={styles.footerSectionTitle}>{'Discount'}</Text>
+                    </View>
+                    <Text style={styles.footerSectionValue}>{'4'}</Text>
+                </View>
+                <View style={styles.footerViewContainer}>
+                    <View style={[styles.footerSection, { backgroundColor: "#31C700" }]}>
+                        <Text style={styles.footerSectionTitle}>{'Final Total'}</Text>
+                    </View>
+                    <Text style={styles.footerSectionValue}>{'4'}</Text>
                 </View>
 
+                
             </View>
         );
     }
@@ -165,22 +179,9 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         height: 55,
-        paddingHorizontal: 8,
-        ...Platform.select({
-            ios: {
-                shadowColor: 'black',
-                shadowOffset: { height: 0 },
-                shadowOpacity: 0.2,
-                shadowRadius: 5,
-            },
-            android: {
-                elevation: 5,
-            },
-        }),
         alignItems: 'center',
-        backgroundColor: 'black',
+        backgroundColor: '#F7F7F9',
         flexDirection: 'row',
-        // justifyContent: 'center',
     },
     sectionContentContainer: {
         height: 80,
@@ -189,27 +190,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     card: {
-        // borderRadius: 5,
         flexDirection: 'row',
         alignItems: 'center',
-        // justifyContent: 'center',
         height: 80,
         width: Dimensions.get('window').width,
-        // marginVertical: 12,
-        // marginHorizontal: 12,
         paddingVertical: 8,
         paddingHorizontal: 8,
-        // ...Platform.select({
-        //     ios: {
-        //         shadowColor: 'black',
-        //         shadowOffset: { height: 0 },
-        //         shadowOpacity: 0.1,
-        //         shadowRadius: 10,
-        //     },
-        //     android: {
-        //         elevation: 3,
-        //     },
-        // }),
     },
     itemImage: {
         height: 50,
@@ -217,11 +203,34 @@ const styles = StyleSheet.create({
         marginEnd: 8,
         borderRadius: 5,
     },
-    screenHeaderText: {
-        width: Dimensions.get('window').width - 145,
+    footerViewContainer: {
+        marginVertical: 1,
+        height: 45,
+        alignItems: 'center',
+        backgroundColor: '#F7F7F9',
+        flexDirection: 'row',
+    },
+    footerSection: {
+        width: Dimensions.get("window").width * 0.36,
+        height: '100%',
+        justifyContent: 'center',
+        padding: 5,
+    },
+    footerSectionTitle: {
         color: 'white',
         fontSize: 16,
-        fontWeight: '500',
+        marginHorizontal: 2,
+    },
+    footerSectionValue: {
+        color: 'black',
+        fontSize: 16,
+        marginHorizontal: 2,
+        textAlign: 'center',
+        width: Dimensions.get("window").width * 0.6,
+    },
+    screenHeaderText: {
+        color: Colors.appTheme,
+        fontSize: 16,
         marginHorizontal: 2,
     },
     sectionContentText: {

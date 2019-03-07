@@ -11,36 +11,14 @@ import {
   HomeScreen,
   ServicesScreen,
   ServicesItemsScreen,
-  ServicesItemDetailScreen
+  ServicesItemDetailScreen,
+  CartScreen
 } from '../screens';
-
-// const ServicesStackScreen = createStackNavigator({
-//   screen: ServicesScreen
-// });
-
-// const ServicesItemsStackScreen = createStackNavigator({
-//   screen: ServicesItemsScreen,
-//   ServicesItemDetail: ServicesItemDetailScreen
-// }, {
-//   mode: 'modal',
-//   headerMode: 'float'
-// });
-
-// const ServicesItemDetailStackScreen = createStackNavigator({
-//   screen: ServicesItemDetailScreen
-// }, {
-//   mode: 'modal',
-//   headerMode: 'none'
-// });
 
 const ServicesStack = createStackNavigator({
   Main: ServicesScreen,
   ServicesItems: ServicesItemsScreen,
-  // ServicesItemDetail: ServicesItemDetailScreen
-}, {
-    // mode: 'modal',
-    // headerMode: 'float'
-  });
+});
 
 const HomeStack = createStackNavigator({
   Home: HomeScreen,
@@ -51,6 +29,7 @@ const HomeStack = createStackNavigator({
     }
   },
   ServicesItemDetail: ServicesItemDetailScreen,
+  Cart: CartScreen
 }, {
     mode: 'modal',
     headerMode: 'screen',

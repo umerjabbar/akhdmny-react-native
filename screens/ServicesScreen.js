@@ -32,7 +32,7 @@ export class ServicesScreen extends React.Component {
         }),
       },
 
-      headerRight: <NavigationBarButton name={Platform.OS === 'ios' ? 'md-cart' : 'md-cart'} onPress={() => navigation.navigate('Map')} />,
+      headerRight: <NavigationBarButton name={Platform.OS === 'ios' ? 'md-cart' : 'md-cart'} onPress={() => navigation.navigate('Cart')} />,
       headerLeft: <NavigationBarButton name={Platform.OS === 'ios' ? 'ios-arrow-down' : 'ios-arrow-down'} onPress={() => navigation.pop()} />
       // header: null
     };

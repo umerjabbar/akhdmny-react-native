@@ -23,7 +23,7 @@ const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 export  class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
-      title: 'DASHBOARD',
+      title: 'HOME',
       headerTintColor: '#ffffff',
       headerStyle: {
         backgroundColor: Colors.appTheme,
@@ -36,7 +36,7 @@ export  class HomeScreen extends React.Component {
         }),
       },
 
-      headerRight: <NavigationBarButton name={Platform.OS === 'ios' ? 'md-cart' : 'md-cart'} onPress={() => navigation.navigate('Map')} />,
+      headerRight: <NavigationBarButton name={Platform.OS === 'ios' ? 'md-cart' : 'md-cart'} onPress={() => navigation.navigate('Cart')} />,
       headerLeft: <NavigationBarButton name={Platform.OS === 'ios' ? 'md-menu' : 'md-menu'} onPress={() => navigation.navigate('Scanner')} />
       // header: null
     };
