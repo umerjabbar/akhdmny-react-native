@@ -1,19 +1,24 @@
 import React from 'react';
 import {
+    Animated,
     Platform,
     StyleSheet,
     Dimensions,
     FlatList,
+    KeyboardAvoidingView,
+    Keyboard,
     Image,
+    ScrollView,
+    SafeAreaView,
     Text,
     TextInput,
     TouchableOpacity,
     View,
 } from 'react-native';
-import { Icon } from 'expo';
+import { Icon, BlurView } from 'expo';
 import { NavigationBarButton } from '../components';
 import Colors from '../constants/Colors';
-import { Transition } from 'react-navigation-fluid-transitions';
+import Swipeout from 'react-native-swipeout';
 
 export class CartScreen extends React.Component {
     static navigationOptions = ({ navigation }) => {
@@ -32,7 +37,7 @@ export class CartScreen extends React.Component {
             },
 
             // headerRight: <NavigationBarButton name={Platform.OS === 'ios' ? 'md-cart' : 'md-cart'} onPress={() => navigation.navigate('Map')} />,
-            headerLeft: <NavigationBarButton name={Platform.OS === 'ios' ? 'ios-arrow-back' : 'ios-arrow-back'} onPress={() => navigation.pop()} />
+            headerLeft: <NavigationBarButton name={Platform.OS === 'ios' ? 'ios-arrow-down' : 'ios-arrow-down'} onPress={() => navigation.pop()} />
             // header: null
         };
     };
@@ -41,7 +46,15 @@ export class CartScreen extends React.Component {
         super();
         this.state = {
             items: ([]),
+            offerBackgroundColor: 'transparent',
+            priceBackgroundColor: Colors.appTheme,
+            number: 55,
+            canAddTip: false,
+            canPlaceOrder: false,
+            tipPrice: 0,
+            isPriceVisible: true,
         };
+        this.is_bid = 0;
         this.makeSections();
     }
 
@@ -62,26 +75,77 @@ export class CartScreen extends React.Component {
         this.props.navigation.navigate('ServicesItemDetail', { item, index });
     }
 
+    _bidButtonAction(choice) {
+        if (choice == 1) {
+            this.is_bid = 1;
+            this.setState({
+                offerBackgroundColor: Colors.appTheme,
+                priceBackgroundColor: 'transparent',
+                number: 43121,
+                isPriceVisible: false
+            }, () => {
+                console.log(this.state.number);
+            });
+        } else {
+            this.is_bid = 0;
+            this.setState({
+                priceBackgroundColor: Colors.appTheme,
+                offerBackgroundColor: 'transparent',
+                number: 1312,
+                isPriceVisible: true
+            });
+        }
+        console.log(choice);
+    }
+
     render() {
         return (
-            <View style={styles.container}>
+            <SafeAreaView style={styles.container}>
                 <FlatList
                     style={styles.flatContainer}
                     data={this.state.items}
                     renderItem={this._renderItem}
                     keyExtractor={(item, index) => item.id}
                     numColumns={1}
-                    ListHeaderComponent={this.renderHeader}
-                    ListFooterComponent={this.renderFooter}
+                    ListHeaderComponent={this.renderHeader.bind(this)}
+                    ListFooterComponent={this.renderFooter.bind(this)}
                     ItemSeparatorComponent={this.renderSeparator}
                 />
-            </View>
+                {this.state.canAddTip && <BlurView tint='dark' intensity={100} style={{ height: '100%', width: '100%', position: 'absolute' }}>
+                    <TouchableOpacity onPress={() => { Keyboard.dismiss(); this.setState({ canAddTip: false }) }} activeOpacity={1.0} style={{ height: '100%', width: '100%', flexDirection: 'column-reverse' }}>
+                        <KeyboardAvoidingView behavior={'position'} keyboardVerticalOffset={65}>
+                            <TextInput
+                                style={styles.inputText}
+                                placeholder={'TIP'}
+                                placeholderTextColor={'#999'}
+                                keyboardType={'numeric'}
+                                clearButtonMode={'while-editing'}
+                                underlineColorAndroid={'#fff'}
+                                multiline={false}
+                                autoCorrect={false}
+                            />
+                            <TouchableOpacity onPress={() => { Keyboard.dismiss(); this.setState({ canAddTip: false, tipPrice: 10 }); }} activeOpacity={0.8}>
+                                <View style={[{ backgroundColor: Colors.appTheme, width: '100%', height: 65 }]}>
+                                    <Text style={styles.buttonText}>Add To Cart</Text>
+                                </View>
+                            </TouchableOpacity>
+                        </KeyboardAvoidingView>
+                    </TouchableOpacity>
+                </BlurView>}
+                {this.state.canPlaceOrder && <BlurView tint='dark' intensity={100} style={{ height: '100%', width: '100%', position: 'absolute' }}>
+                    <TouchableOpacity onPress={() => { Keyboard.dismiss(); this.setState({ canPlaceOrder: false }) }} activeOpacity={1.0} style={{ height: '100%', width: '100%', alignItems: 'center' }}>
+                       <View style={{width: Dimensions.get('window').width * 0.9, height: Dimensions.get('window').width * 0.9, backgroundColor: 'white', borderRadius: 5}}>
+
+                       </View>
+                    </TouchableOpacity>
+                </BlurView>}
+            </SafeAreaView>
         );
     }
 
     _renderItem = ({ item, index }) => {
         return (
-            <Transition shared={`item${index}`}>
+            <Swipeout right={[{ text: 'Delete', color: 'white', backgroundColor: 'red' }]}>
                 <View style={styles.sectionContentContainer}>
                     <TouchableOpacity onPress={() => this._onItemPress(item, index)}
                         activeOpacity={0.8} style={[styles.card, { backgroundColor: item.color }]}>
@@ -94,12 +158,14 @@ export class CartScreen extends React.Component {
                                 {item.address}
                             </Text>
                         </View>
-                        <Text style={styles.sectionPriceText}>
+                        {this.state.isPriceVisible && <Text style={styles.sectionPriceText}>
                             {item.price}
-                        </Text>
+                        </Text>}
                     </TouchableOpacity>
                 </View>
-            </Transition>
+            </Swipeout>
+            // {/* </Transition> */}
+            // {/*<Transition shared={`item${index}`}> */}
         );
     };
 
@@ -118,14 +184,26 @@ export class CartScreen extends React.Component {
     renderFooter = () => {
         return (
             <View style={{ marginTop: 5 }}>
+                <View style={{ alignItems: 'center', width: '100%', marginVertical: 10 }}>
+                    <View style={styles.sectionSelectionButton}>
+                        <TouchableOpacity style={[styles.sectionButton, { backgroundColor: this.state.priceBackgroundColor }]} onPress={() => this._bidButtonAction.bind(this)(0)} activeOpacity={0.8}>
+                            <Text style={[styles.buttonText, { color: 'white', }]}>Price</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={[styles.sectionButton, { backgroundColor: this.state.offerBackgroundColor }]} onPress={() => this._bidButtonAction.bind(this)(1)} activeOpacity={0.8}>
+                            <Text style={[styles.buttonText, { color: 'white', }]}>Offer</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
                 <View style={styles.footerViewContainer}>
-                    <View style={[styles.footerSection, { backgroundColor: "#31B2F5" }]}>
-                        {/* <Icon.FontAwesome name={'money'} size={25} color={'black'} /> */}
+                    <View style={[styles.footerSection, { backgroundColor: "#31B2F5", flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }]}>
+                        <Icon.FontAwesome style={{ marginHorizontal: 4 }} name={'money'} size={20} color={'white'} />
                         <Text style={styles.footerSectionTitle}>{'Add Tip'}</Text>
                     </View>
-                    <Text style={[styles.screenHeaderText, {marginHorizontal: 5}]}>{'Enter amount'}</Text>
-                    <Icon.Ionicons style={{ position: 'absolute', end: 40 }} name={'ios-arrow-forward'} size={20} color={'black'} />
-                    <Text style={[styles.screenHeaderText, {position: 'absolute', end: 12}]}>{'12'}</Text>
+                    <TouchableOpacity onPress={() => {this.setState({canAddTip: true}); }}>
+                        <Text style={[styles.screenHeaderText, { marginHorizontal: 5 }]}>{'Enter amount'}</Text>
+                    </TouchableOpacity>
+                    <Icon.Ionicons style={{ position: 'absolute', end: 42 }} name={'ios-arrow-forward'} size={20} color={'black'} />
+                    <Text style={[styles.screenHeaderText, { position: 'absolute', end: 14 }]}>{'12'}</Text>
                 </View>
                 <View style={styles.footerViewContainer}>
                     <View style={[styles.footerSection, { backgroundColor: "#1266B3" }]}>
@@ -137,7 +215,7 @@ export class CartScreen extends React.Component {
                     <View style={[styles.footerSection, { backgroundColor: "#EDB61A" }]}>
                         <Text style={styles.footerSectionTitle}>{'Discount'}</Text>
                     </View>
-                    <Text style={styles.footerSectionValue}>{'4'}</Text>
+                    <Text style={styles.footerSectionValue}>{this.state.number}</Text>
                 </View>
                 <View style={styles.footerViewContainer}>
                     <View style={[styles.footerSection, { backgroundColor: "#31C700" }]}>
@@ -145,8 +223,11 @@ export class CartScreen extends React.Component {
                     </View>
                     <Text style={styles.footerSectionValue}>{'4'}</Text>
                 </View>
-
-                
+                <View style={{ alignItems: 'center', width: '100%', marginVertical: 10 }}>
+                    <TouchableOpacity style={[styles.button, { backgroundColor: Colors.appTheme }]} onPress={() => {this.setState({canPlaceOrder: true});}} activeOpacity={0.8}>
+                        <Text style={[styles.buttonText, { color: 'white' }]}>Send</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         );
     }
@@ -211,27 +292,47 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
     footerSection: {
-        width: Dimensions.get("window").width * 0.36,
+        // width: Dimensions.get("window").width * 0.3,
+        width: 125,
         height: '100%',
         justifyContent: 'center',
         padding: 5,
     },
     footerSectionTitle: {
         color: 'white',
-        fontSize: 16,
-        marginHorizontal: 2,
+        marginHorizontal: 8,
+        ...Platform.select({
+            ios: {
+                fontSize: 17,
+                fontWeight: '500'
+            },
+            android: {
+                fontSize: 16,
+                fontWeight: '400'
+            },
+        }),
     },
     footerSectionValue: {
         color: 'black',
-        fontSize: 16,
-        marginHorizontal: 2,
+        marginHorizontal: 4,
         textAlign: 'center',
         width: Dimensions.get("window").width * 0.6,
+        ...Platform.select({
+            ios: {
+                fontSize: 17,
+                // fontWeight: '500'
+            },
+            android: {
+                fontSize: 16,
+                fontWeight: '400'
+            },
+        }),
     },
     screenHeaderText: {
         color: Colors.appTheme,
         fontSize: 16,
         marginHorizontal: 2,
+
     },
     sectionContentText: {
         width: Dimensions.get('window').width - 145,
@@ -254,6 +355,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
         fontWeight: '500',
         marginHorizontal: 2,
+
     },
     searchInput: {
         flexDirection: 'row',
@@ -269,31 +371,40 @@ const styles = StyleSheet.create({
     },
     inputText: {
         // display: 'flex',
-        marginLeft: 20,
-        fontSize: 15,
-        height: '100%',
-        width: Dimensions.get('window').width - 20 - 80 - 8,
-        color: '#999',
+        fontSize: 25,
+        height: 65,
+        width: '100%',
+        backgroundColor: 'white',
+        color: 'black',
+        fontWeight: '600',
+        textAlign: 'center',
+    },
+    sectionSelectionButton: {
+        flexDirection: 'row',
+        width: 300,
+        marginVertical: 10,
+        borderRadius: 5,
+        overflow: 'hidden',
+        backgroundColor: '#C0C0C0'
+    },
+    sectionButton: {
+        alignItems: 'center',
+        height: 45,
+        justifyContent: 'center',
+        width: '50%',
     },
     button: {
-        height: 35,
-        width: 80,
-        alignSelf: 'center',
+        alignItems: 'center',
+        marginHorizontal: 15,
+        marginVertical: 10,
+        height: 50,
         borderRadius: 5,
-        marginVertical: 5,
-        // alignItems: 'center',
-        // marginHorizontal: 15,
         justifyContent: 'center',
-        backgroundColor: Colors.appTheme,
-        // flexDirection: 'row',
-        // height: '100%',
-        // width: Dimensions.get('screen').width / 2 - 30
+        width: 240,
     },
     buttonText: {
-        marginHorizontal: 5,
         textAlign: 'center',
-        padding: 6,
-        fontSize: 17,
-        color: 'white'
-    }
+        padding: 8,
+        fontSize: 18,
+    },
 });

@@ -20,6 +20,7 @@
     "react-native-flash-message": "^0.1.10",
     "react-native-maps": "^0.23.0",
     "react-native-side-drawer": "^1.0.9",
+    "react-native-swipeout": "^2.3.6",
     "react-navigation": "^3.0.9",
     "react-navigation-fluid-transitions": "^0.3.1"
   },

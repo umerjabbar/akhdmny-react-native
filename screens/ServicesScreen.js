@@ -5,6 +5,7 @@ import {
   Dimensions,
   FlatList,
   Image,
+  SafeAreaView,
   Text,
   TouchableOpacity,
   View,
@@ -68,7 +69,7 @@ export class ServicesScreen extends React.Component {
           {/* <Transition shared={`image${index}`}> */}
             <Image style={styles.itemImage} source={{ uri: item.icon }} />
           {/* </Transition> */}
-          <Text style={styles.sectionContentText}>
+          <Text style={styles.sectionContentText} numberOfLines={1}>
             {item.title}
           </Text>
         </TouchableOpacity>
@@ -78,7 +79,7 @@ export class ServicesScreen extends React.Component {
 
   render() {
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <FlatList
           style={styles.flatContainer}
           data={this.state.items}
@@ -87,7 +88,7 @@ export class ServicesScreen extends React.Component {
           numColumns={COLUMNS}
           ListHeaderComponent={this.renderHeader}
         />
-      </View>
+      </SafeAreaView>
     );
   }
 }
@@ -138,8 +139,15 @@ const styles = StyleSheet.create({
   },
   sectionContentText: {
     color: 'white',
-    fontSize: 14,
-    fontWeight: '400',
-    marginLeft: 6,
+    ...Platform.select({
+      ios: {
+        fontSize: 14,
+        fontWeight: '500',
+      },
+      android: {
+        fontSize: 14,
+        fontWeight: '300',
+      },
+    }),
   },
 });

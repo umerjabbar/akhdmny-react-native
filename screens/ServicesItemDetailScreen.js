@@ -190,7 +190,7 @@ export class ServicesItemDetailScreen extends React.Component {
     render() {
         return (
             <View style={styles.container}>
-                {/* <BlurView tint='dark' intensity={50} style={styles.backgroundImage}></BlurView> */}
+                
                 {/* <Transition shared={`item${this.props.navigation.state.params.index}`}> */}
                 <View style={styles.sectionContentContainer}>
                     <View style={[styles.card, { backgroundColor: 'white' }]}>
@@ -211,7 +211,7 @@ export class ServicesItemDetailScreen extends React.Component {
                 {/* </Transition> */}
                 <View style={styles.bottomSectionContentContainer}>
                     <View style={[styles.bottomCard, { backgroundColor: 'white' }]}>
-                        <KeyboardAvoidingView>
+                        <KeyboardAvoidingView behavior={'height'}>
                             <ScrollView keyboardDismissMode='on-drag'>
                                 <TextInput
                                     style={styles.inputText}

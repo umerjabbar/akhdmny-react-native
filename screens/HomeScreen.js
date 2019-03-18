@@ -5,6 +5,7 @@ import {
   ScrollView,
   StyleSheet,
   Dimensions,
+  SafeAreaView,
   Text,
   TouchableOpacity,
   View,
@@ -89,7 +90,7 @@ export  class HomeScreen extends React.Component {
 
   render() {
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <View style={styles.mapView}>
           <MapView
             style={{ flex: 1 }}
@@ -122,7 +123,7 @@ export  class HomeScreen extends React.Component {
             <Text style={styles.buttonText}>Services</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </SafeAreaView>
     );
   }
 
@@ -130,8 +131,8 @@ export  class HomeScreen extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: Colors.appTheme,
     flex: 1,
-    backgroundColor: '#fff',
   },
   mapView: {
     top: 0,

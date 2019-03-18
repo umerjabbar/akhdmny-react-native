@@ -5,6 +5,7 @@ import {
     Dimensions,
     FlatList,
     Image,
+    SafeAreaView,
     Text,
     TextInput,
     TouchableOpacity,
@@ -64,11 +65,11 @@ export class ServicesItemsScreen extends React.Component {
 
     render() {
         return (
-            <View style={styles.container}>
+            <SafeAreaView style={styles.container}>
                 <View style={styles.upperViewContainer}>
                     {/* <Transition shared={`image${this.props.navigation.state.params.index}`}> */}
-                        <Image style={{ height: 40, width: 40, borderRadius: 20, backgroundColor: 'white', marginHorizontal: 6 }}
-                            source={{ uri: this.props.navigation.state.params.item.icon }}></Image>
+                    <Image style={{ height: 40, width: 40, borderRadius: 20, backgroundColor: 'white', marginHorizontal: 6 }}
+                        source={{ uri: this.props.navigation.state.params.item.icon }}></Image>
                     {/* </Transition> */}
                     <Text style={styles.screenHeaderText}>{this.props.navigation.state.params.item.title}</Text>
                 </View>
@@ -79,9 +80,9 @@ export class ServicesItemsScreen extends React.Component {
                     keyExtractor={(item, index) => item.id}
                     numColumns={1}
                     ListHeaderComponent={this.renderHeader}
-                    ItemSeparatorComponent={this.renderSeparator}
+                    ItemSeparatorComponent={this.renderSeparator.bind(this)}
                 />
-            </View>
+            </SafeAreaView>
         );
     }
 
@@ -234,10 +235,18 @@ const styles = StyleSheet.create({
     sectionTitleText: {
         width: Dimensions.get('window').width - 145,
         color: 'black',
-        fontSize: 16,
-        fontWeight: '500',
         marginHorizontal: 2,
         marginTop: 4,
+        ...Platform.select({
+            ios: {
+                fontSize: 16,
+                fontWeight: '600',
+            },
+            android: {
+                fontSize: 16,
+                fontWeight: '500',
+            },
+        }),
     },
     sectionPriceText: {
         width: 65,
@@ -283,8 +292,17 @@ const styles = StyleSheet.create({
     buttonText: {
         marginHorizontal: 5,
         textAlign: 'center',
-        padding: 6,
-        fontSize: 17,
-        color: 'white'
+        padding: 4,
+        color: 'white',
+        ...Platform.select({
+            ios: {
+                fontSize: 17,
+                // fontWeight: '400',
+            },
+            android: {
+                fontSize: 15,
+                fontWeight: '400',
+            },
+        }),
     }
 });
