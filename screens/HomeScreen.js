@@ -11,15 +11,23 @@ import {
   View,
   Button,
 } from 'react-native';
-import { Location, Permissions, Icon } from 'expo';
+import { Location, Permissions, Icon, Localization } from 'expo';
 import { NavigationBarButton } from '../components';
 import Colors from '../constants/Colors'
 import MapView, { PROVIDER_GOOGLE, Marker, AnimatedRegion } from 'react-native-maps';
+import i18n from 'i18n-js';
+import {homeScreenEn, homeScreenAr} from '../constants/Translations'
+
+i18n.fallbacks = true;
+i18n.translations = { homeScreenEn, homeScreenAr };
+i18n.locale = Localization.locale;
+
 
 const screen = Dimensions.get('window');
 const ASPECT_RATIO = screen.width / screen.height;
 const LATITUDE_DELTA = 0.016;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
+
 
 export  class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
@@ -112,7 +120,7 @@ export  class HomeScreen extends React.Component {
               name={'my-location'}
               size={28}
               color={'white'}/>
-            <Text style={styles.buttonText}>My Location</Text>
+            <Text style={styles.buttonText}>{i18n.t(homeScreenEn["My Location"])}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.button} onPress={() => this.props.navigation.navigate('Services')} activeOpacity={0.6}>
@@ -120,7 +128,7 @@ export  class HomeScreen extends React.Component {
               name={'format-list-bulleted'}
               size={28}
               color={'white'}/>
-            <Text style={styles.buttonText}>Services</Text>
+            <Text style={styles.buttonText}>{i18n.t(homeScreenEn.Services)}</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>

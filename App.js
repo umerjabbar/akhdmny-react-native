@@ -1,13 +1,24 @@
 import React from 'react';
-import { Platform, StatusBar, StyleSheet, View } from 'react-native';
-import { AppLoading, Asset, Font, Icon } from 'expo';
+import { Platform, StatusBar, StyleSheet, View, I18nManager } from 'react-native';
+import { AppLoading, Asset, Font, Icon, Localization, Updates } from 'expo';
 import AppNavigator from './navigation/AppNavigator';
 import FlashMessage from "react-native-flash-message";
+
+I18nManager.allowRTL(true);
+// I18nManager.forceRTL(true);
 
 export default class App extends React.Component {
   state = {
     isLoadingComplete: false,
   };
+
+  constructor(){
+    super();
+    console.log({Localization: Localization.isRTL});
+    if (Localization.isRTL) {
+
+    }
+  }
 
   render() {
     if (!this.state.isLoadingComplete && !this.props.skipLoadingScreen) {

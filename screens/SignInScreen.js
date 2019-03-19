@@ -13,13 +13,36 @@ import {
 } from 'react-native';
 
 import Colors from '../constants/Colors'
-import { LinearGradient, Icon, DangerZone } from 'expo';
+import { LinearGradient, Icon, DangerZone, Localization } from 'expo';
 import CountryPicker, { getAllCountries } from 'react-native-country-picker-modal';
 import { showMessage, hideMessage } from 'react-native-flash-message';
 import { Header } from 'react-navigation';
 import { LocalConstants, NetworkServices } from '../constants/Constants'
+import i18n from 'i18n-js';
 
-const { Localization } = DangerZone;
+
+const en = {
+  l1: "LOGIN TO YOUR ACCOUNT",
+  l2: "Phone",
+  l3: "Password",
+  l4:"Login",
+  l5:"Forgot Password?",
+  l6:"Skip Login",
+  l7:"Register Now",
+}
+const ar = {
+  l1: "تسجيل الدخول إلى حسابك",
+  l2: "هاتف",
+  l3: "كلمه السر",
+  l4:"تسجيل الدخول",
+  l5:"هل نسيت كلمة المرور؟",
+  l6:"تخطي تسجيل الدخول",
+  l7:"سجل الان",
+}
+
+i18n.fallbacks = false;
+i18n.translations = { en, ar };
+i18n.locale = Localization.locale;
 
 export class SignInScreen extends React.Component {
 
@@ -165,6 +188,11 @@ export class SignInScreen extends React.Component {
   }
 
   render() {
+    const rtlText = Localization.isRTL && {
+      textAlign: 'right',
+      writingDirection: 'rtl',
+    };
+
     return (
       <View style={styles.container}>
         <LinearGradient colors={[Colors.appTheme, Colors.appTheme, Colors.appTheme]} style={styles.backgroundImage}></LinearGradient>
@@ -173,7 +201,7 @@ export class SignInScreen extends React.Component {
             source={require('../assets/images/logo.png')}
             style={styles.logoImage} resizeMode={'cover'}
           />
-          <Text style={{ color: 'white', fontSize: 18, marginVertical: 10 }}>LOGIN TO YOUR ACCOUNT</Text>
+          <Text style={{ color: 'white', fontSize: 18, marginVertical: 10 }}>{i18n.t('l1')}</Text>
           <View style={[styles.textboxView, { borderColor: this.state.phoneBorderColor }]}>
             <View style={{ width: 30, top: -3 }}>
               <CountryPicker
@@ -181,13 +209,13 @@ export class SignInScreen extends React.Component {
                 cca2={this.state.cca2 || 'SA'} translation='eng' />
             </View>
             <Text style={styles.codeStyle}>{`+${this.state.callingCode}`}</Text>
-            <TextInput style={[styles.phoneTextInput]} placeholder={'Phone'} keyboardType={'phone-pad'}
+            <TextInput style={[styles.phoneTextInput, rtlText]} placeholder={i18n.t('l2')} keyboardType={'phone-pad'}
               onChangeText={(phone) => this._onPhoneChange(phone.replace(/\s/g, ""))}
               textContentType={'telephoneNumber'} placeholderTextColor={'#D4D4D4'} />
           </View>
           <View style={[styles.textboxView, { borderColor: this.state.passwordBorderColor }]}>
             <Icon.EvilIcons name={'lock'} size={30} color={'white'} />
-            <TextInput style={[styles.passwordTextInput]} placeholder={'Password'} keyboardType={'default'}
+            <TextInput style={[styles.passwordTextInput, rtlText]} placeholder={i18n.t('l3')} keyboardType={'default'}
               secureTextEntry={this.state.isSecurePassword} onChangeText={(password) => this._onPasswordChange(password.replace(/\s/g, ""))}
               textContentType={'password'} placeholderTextColor={'#D4D4D4'} />
             <TouchableOpacity onPress={() => this._eyeButtonAction()} activeOpacity={0.6}>
@@ -195,16 +223,16 @@ export class SignInScreen extends React.Component {
             </TouchableOpacity>
           </View>
           <TouchableOpacity style={[styles.button, { backgroundColor: 'white' }]} onPress={() => this._loginButtonAction()} activeOpacity={0.8}>
-            <Text style={[styles.buttonText, { color: Colors.appTheme }]}>Login</Text>
+            <Text style={[styles.buttonText, { color: Colors.appTheme }]}>{i18n.t('l4')}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.underlineView]} onPress={() => this._ForgetPasswordButtonAction()} activeOpacity={0.6}>
-            <Text style={styles.underlineText}>Forgot Password?</Text>
+            <Text style={styles.underlineText}>{i18n.t('l5')}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.underlineView]} onPress={() => this._SkipLoginButtonAction()} activeOpacity={0.6}>
-            <Text style={styles.underlineText}>Skip Login</Text>
+            <Text style={styles.underlineText}>{i18n.t('l6')}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.underlineView]} onPress={() => this._RegisterNowButtonAction()} activeOpacity={0.6}>
-            <Text style={styles.underlineText}>Register Now</Text>
+            <Text style={styles.underlineText}>{i18n.t('l7')}</Text>
           </TouchableOpacity>
           <View style={{ height: Header.HEIGHT + Dimensions.get('screen').height * 0.05 }}></View>
         </View>
@@ -251,14 +279,15 @@ const styles = StyleSheet.create({
   },
   phoneTextInput: {
     height: '100%',
-    width: 260 - 30 - 16 - 5 - 30,
+    width: 260 - 30 - 16 - 5 - 34,
     fontSize: 17,
     color: 'white',
     marginStart: 5,
+    // textAlign: 
   },
   passwordTextInput: {
     height: '100%',
-    width: 260 - 30 - 16 - 5 - 30,
+    width: 260 - 30 - 16 - 5 - 34,
     fontSize: 17,
     marginStart: 5,
     color: 'white',

@@ -8,6 +8,7 @@ import {
     KeyboardAvoidingView,
     Keyboard,
     Image,
+    Modal,
     ScrollView,
     SafeAreaView,
     Text,
@@ -111,34 +112,77 @@ export class CartScreen extends React.Component {
                     ListFooterComponent={this.renderFooter.bind(this)}
                     ItemSeparatorComponent={this.renderSeparator}
                 />
-                {this.state.canAddTip && <BlurView tint='dark' intensity={100} style={{ height: '100%', width: '100%', position: 'absolute' }}>
-                    <TouchableOpacity onPress={() => { Keyboard.dismiss(); this.setState({ canAddTip: false }) }} activeOpacity={1.0} style={{ height: '100%', width: '100%', flexDirection: 'column-reverse' }}>
-                        <KeyboardAvoidingView behavior={'position'} keyboardVerticalOffset={65}>
-                            <TextInput
-                                style={styles.inputText}
-                                placeholder={'TIP'}
-                                placeholderTextColor={'#999'}
-                                keyboardType={'numeric'}
-                                clearButtonMode={'while-editing'}
-                                underlineColorAndroid={'#fff'}
-                                multiline={false}
-                                autoCorrect={false}
-                            />
-                            <TouchableOpacity onPress={() => { Keyboard.dismiss(); this.setState({ canAddTip: false, tipPrice: 10 }); }} activeOpacity={0.8}>
-                                <View style={[{ backgroundColor: Colors.appTheme, width: '100%', height: 65 }]}>
-                                    <Text style={styles.buttonText}>Add To Cart</Text>
+                <Modal
+                    animationType='fade'
+                    transparent={true}
+                    visible={this.state.canAddTip}
+                    onRequestClose={() => {
+                        this.setState({ canAddTip: false })
+                    }}>
+                    <BlurView tint='dark' intensity={100} style={{ height: '100%', width: '100%', position: 'absolute' }}>
+                        <TouchableOpacity onPress={() => { Keyboard.dismiss(); this.setState({ canAddTip: false }) }} activeOpacity={1.0} style={{ height: '100%', width: '100%', flexDirection: 'column-reverse' }}>
+                            <KeyboardAvoidingView behavior={'position'}>
+                                <TextInput
+                                    style={styles.inputText}
+                                    placeholder={'TIP'}
+                                    placeholderTextColor={'#999'}
+                                    keyboardType={'numeric'}
+                                    clearButtonMode={'while-editing'}
+                                    underlineColorAndroid={'#fff'}
+                                    multiline={false}
+                                    autoCorrect={false}
+                                    autoFocus = {true}
+                                />
+                                <TouchableOpacity onPress={() => { Keyboard.dismiss(); this.setState({ canAddTip: false, tipPrice: 10 }); }} activeOpacity={0.8}>
+                                    <View style={[{ backgroundColor: Colors.appTheme, width: '100%', height: 65 }]}>
+                                        <Text style={styles.buttonText}>Add To Cart</Text>
+                                    </View>
+                                </TouchableOpacity>
+                            </KeyboardAvoidingView>
+                        </TouchableOpacity>
+                    </BlurView>
+                </Modal>
+                <Modal
+                    animationType='fade'
+                    transparent={true}
+                    visible={this.state.canPlaceOrder}
+                    onRequestClose={() => {
+                        this.setState({ canPlaceOrder: false })
+                    }}>
+                    <BlurView tint='dark' intensity={100} style={{ height: '100%', width: '100%', position: 'absolute' }}>
+                        <TouchableOpacity onPress={() => { this.setState({ canPlaceOrder: false }) }} activeOpacity={1.0} style={{ height: '100%', width: '100%', alignItems: 'center', justifyContent: 'center' }}>
+                            <TouchableOpacity activeOpacity={1.0}>
+                                <View style={{ width: Dimensions.get('window').width * 0.9, backgroundColor: 'white', borderRadius: 5, alignItems: 'center', padding: 20 }}>
+                                    <Text style={{ fontSize: 19, fontWeight: '600', marginBottom: 40 }}>Confirmation Order</Text>
+                                    <View style={{width: Dimensions.get('window').width * 0.7}}>
+                                        <View style={{ margin: 10, flexDirection: 'row', justifyContent: 'center' }}>
+                                            <Text style={[styles.confirmationSectionTitle, { color: 'black' }]}>{'Total Services'}</Text>
+                                            <Text style={styles.confirmationSectionValue}>{'4'}</Text>
+                                        </View>
+                                        <View style={{ margin: 10, flexDirection: 'row', justifyContent: 'center' }}>
+                                            <Text style={[styles.confirmationSectionTitle, { color: 'black' }]}>{'Discount'}</Text>
+                                            <Text style={styles.confirmationSectionValue}>{'4'}</Text>
+                                        </View>
+                                        <View style={{ margin: 10, flexDirection: 'row', justifyContent: 'center' }}>
+                                            <Text style={[styles.confirmationSectionTitle, { color: 'black' }]}>{'Final Total'}</Text>
+                                            <Text style={styles.confirmationSectionValue}>{'4'}</Text>
+                                        </View>
+                                    </View>
+                                    <View style={{ alignItems: 'center', width: '100%', marginTop: 20 }}>
+                                        <TouchableOpacity style={[styles.button, { backgroundColor: Colors.green, marginBottom: 8 }]} onPress={() => { this.setState({ canPlaceOrder: false }); }} activeOpacity={0.8}>
+                                            <Text style={[styles.buttonText, { color: 'white' }]}>Confirm</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                    <View style={{ alignItems: 'center', width: '100%', }}>
+                                        <TouchableOpacity style={[styles.button, { backgroundColor: Colors.red, marginVertical: 0 }]} onPress={() => { this.setState({ canPlaceOrder: false }) }} activeOpacity={0.8}>
+                                            <Text style={[styles.buttonText, { color: 'white' }]}>Cancel</Text>
+                                        </TouchableOpacity>
+                                    </View>
                                 </View>
                             </TouchableOpacity>
-                        </KeyboardAvoidingView>
-                    </TouchableOpacity>
-                </BlurView>}
-                {this.state.canPlaceOrder && <BlurView tint='dark' intensity={100} style={{ height: '100%', width: '100%', position: 'absolute' }}>
-                    <TouchableOpacity onPress={() => { Keyboard.dismiss(); this.setState({ canPlaceOrder: false }) }} activeOpacity={1.0} style={{ height: '100%', width: '100%', alignItems: 'center' }}>
-                       <View style={{width: Dimensions.get('window').width * 0.9, height: Dimensions.get('window').width * 0.9, backgroundColor: 'white', borderRadius: 5}}>
-
-                       </View>
-                    </TouchableOpacity>
-                </BlurView>}
+                        </TouchableOpacity>
+                    </BlurView>
+                </Modal>
             </SafeAreaView>
         );
     }
@@ -199,7 +243,7 @@ export class CartScreen extends React.Component {
                         <Icon.FontAwesome style={{ marginHorizontal: 4 }} name={'money'} size={20} color={'white'} />
                         <Text style={styles.footerSectionTitle}>{'Add Tip'}</Text>
                     </View>
-                    <TouchableOpacity onPress={() => {this.setState({canAddTip: true}); }}>
+                    <TouchableOpacity onPress={() => { this.setState({ canAddTip: true }); }}>
                         <Text style={[styles.screenHeaderText, { marginHorizontal: 5 }]}>{'Enter amount'}</Text>
                     </TouchableOpacity>
                     <Icon.Ionicons style={{ position: 'absolute', end: 42 }} name={'ios-arrow-forward'} size={20} color={'black'} />
@@ -224,7 +268,7 @@ export class CartScreen extends React.Component {
                     <Text style={styles.footerSectionValue}>{'4'}</Text>
                 </View>
                 <View style={{ alignItems: 'center', width: '100%', marginVertical: 10 }}>
-                    <TouchableOpacity style={[styles.button, { backgroundColor: Colors.appTheme }]} onPress={() => {this.setState({canPlaceOrder: true});}} activeOpacity={0.8}>
+                    <TouchableOpacity style={[styles.button, { backgroundColor: Colors.appTheme }]} onPress={() => { this.setState({ canPlaceOrder: true }); }} activeOpacity={0.8}>
                         <Text style={[styles.buttonText, { color: 'white' }]}>Send</Text>
                     </TouchableOpacity>
                 </View>
@@ -406,5 +450,36 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         padding: 8,
         fontSize: 18,
+    },
+    confirmationSectionTitle: {
+        color: 'white',
+        marginHorizontal: 8,
+        width: Dimensions.get('window').width * 0.3,
+        ...Platform.select({
+            ios: {
+                fontSize: 17,
+                fontWeight: '500'
+            },
+            android: {
+                fontSize: 16,
+                fontWeight: '400'
+            },
+        }),
+    },
+    confirmationSectionValue: {
+        color: 'black',
+        marginHorizontal: 4,
+        textAlign: 'center',
+        width: Dimensions.get('window').width * 0.3,
+        ...Platform.select({
+            ios: {
+                fontSize: 17,
+                // fontWeight: '500'
+            },
+            android: {
+                fontSize: 16,
+                fontWeight: '400'
+            },
+        }),
     },
 });

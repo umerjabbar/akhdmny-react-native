@@ -12,14 +12,14 @@ import {
   ActivityIndicator
 } from 'react-native';
 import Colors from '../constants/Colors'
-import { LinearGradient, Icon, DangerZone } from 'expo';
+import { LinearGradient, Icon, DangerZone, Localization } from 'expo';
 import CountryPicker, { getAllCountries } from 'react-native-country-picker-modal';
 import { showMessage, hideMessage } from 'react-native-flash-message';
 import { Header } from 'react-navigation';
 import { LocalConstants, NetworkServices } from '../constants/Constants'
 import { NavigationBarButton } from '../components';
 
-const { Localization } = DangerZone;
+// const { Localization } = DangerZone;
 
 export class ForgetPasswordScreen extends React.Component {
 
@@ -167,6 +167,10 @@ export class ForgetPasswordScreen extends React.Component {
   }
 
   render() {
+    const rtlText = Localization.isRTL && {
+      textAlign: 'right',
+      writingDirection: 'rtl',
+    };
     return (
       <View style={styles.container}>
         <LinearGradient colors={[Colors.appTheme, Colors.appTheme, Colors.appTheme]} style={styles.backgroundImage}></LinearGradient>
@@ -182,7 +186,7 @@ export class ForgetPasswordScreen extends React.Component {
                 cca2={this.state.cca2 || 'SA'} translation='eng' />
             </View>
             <Text style={styles.codeStyle}>{`+${this.state.callingCode}`}</Text>
-            <TextInput style={[styles.phoneTextInput]} placeholder={'Phone'} keyboardType={'phone-pad'}
+            <TextInput style={[styles.phoneTextInput, rtlText]} placeholder={'Phone'} keyboardType={'phone-pad'}
               onChangeText={(phone) => this._onPhoneChange(phone.replace(/\s/g, ""))}
               textContentType={'telephoneNumber'} placeholderTextColor={'#D4D4D4'} />
           </View>
