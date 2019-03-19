@@ -37,7 +37,7 @@ const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 export class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
-      title: navigation.getParam('Title', 'Home'),
+      title: navigation.getParam('Title', 'HOME'),
       headerTintColor: '#ffffff',
       headerStyle: {
         backgroundColor: Colors.appTheme,
@@ -51,7 +51,7 @@ export class HomeScreen extends React.Component {
       },
       
       headerRight: <NavigationBarButton name={Platform.OS === 'ios' ? 'md-cart' : 'md-cart'} onPress={() => navigation.navigate('Cart')} />,
-      headerLeft: <NavigationBarButton name={Platform.OS === 'ios' ? 'md-menu' : 'md-menu'} onPress={() => navigation.navigate('Scanner')} />,
+      headerLeft: <NavigationBarButton name={Platform.OS === 'ios' ? 'md-menu' : 'md-menu'} onPress={() => navigation.toggleDrawer()} />,
       ...navigation.getParam('navBarHidden',  false) ? {header: null} : {},
     };
   };
@@ -114,7 +114,7 @@ export class HomeScreen extends React.Component {
     //   });
     //   this.map.animateToRegion(this.state.region, 100)
     // })
-    // console.log(this.props)
+    console.log(this.props)
     // this.props.navigation.setParams({Title: 'Sky Blue Activity'});
     this._showSearching(true)
   }

@@ -12,7 +12,8 @@ import {
   ServicesScreen,
   ServicesItemsScreen,
   ServicesItemDetailScreen,
-  CartScreen
+  CartScreen,
+  BidScreen,
 } from '../screens';
 
 const ServicesStack = createStackNavigator({

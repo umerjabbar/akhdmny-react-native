@@ -8,4 +8,5 @@ export * from './ServicesScreen';
 export * from './ServicesItemsSrcreen';
 export * from './ServicesItemDetailScreen';
 export * from './CartScreen';
+export * from './BidScreen';
 

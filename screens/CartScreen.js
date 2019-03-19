@@ -121,7 +121,7 @@ export class CartScreen extends React.Component {
                     }}>
                     <BlurView tint='dark' intensity={100} style={{ height: '100%', width: '100%', position: 'absolute' }}>
                         <TouchableOpacity onPress={() => { Keyboard.dismiss(); this.setState({ canAddTip: false }) }} activeOpacity={1.0} style={{ height: '100%', width: '100%', flexDirection: 'column-reverse' }}>
-                            <KeyboardAvoidingView behavior={'position'}>
+                            <KeyboardAvoidingView >
                                 <TextInput
                                     style={styles.inputText}
                                     placeholder={'TIP'}
@@ -131,7 +131,7 @@ export class CartScreen extends React.Component {
                                     underlineColorAndroid={'#fff'}
                                     multiline={false}
                                     autoCorrect={false}
-                                    autoFocus = {true}
+                                    autoFocus={true}
                                 />
                                 <TouchableOpacity onPress={() => { Keyboard.dismiss(); this.setState({ canAddTip: false, tipPrice: 10 }); }} activeOpacity={0.8}>
                                     <View style={[{ backgroundColor: Colors.appTheme, width: '100%', height: 65 }]}>
@@ -154,7 +154,7 @@ export class CartScreen extends React.Component {
                             <TouchableOpacity activeOpacity={1.0}>
                                 <View style={{ width: Dimensions.get('window').width * 0.9, backgroundColor: 'white', borderRadius: 5, alignItems: 'center', padding: 20 }}>
                                     <Text style={{ fontSize: 19, fontWeight: '600', marginBottom: 40 }}>Confirmation Order</Text>
-                                    <View style={{width: Dimensions.get('window').width * 0.7}}>
+                                    <View style={{ width: Dimensions.get('window').width * 0.7 }}>
                                         <View style={{ margin: 10, flexDirection: 'row', justifyContent: 'center' }}>
                                             <Text style={[styles.confirmationSectionTitle, { color: 'black' }]}>{'Total Services'}</Text>
                                             <Text style={styles.confirmationSectionValue}>{'4'}</Text>
