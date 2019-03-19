@@ -10,13 +10,18 @@ import {
   TouchableOpacity,
   View,
   Button,
+  LayoutAnimation,
+  UIManager,
 } from 'react-native';
 import { Location, Permissions, Icon, Localization } from 'expo';
+import {Header} from 'react-navigation';
 import { NavigationBarButton } from '../components';
 import Colors from '../constants/Colors'
 import MapView, { PROVIDER_GOOGLE, Marker, AnimatedRegion } from 'react-native-maps';
 import i18n from 'i18n-js';
-import {homeScreenEn, homeScreenAr} from '../constants/Translations'
+import { homeScreenEn, homeScreenAr } from '../constants/Translations'
+
+import {WaveIndicator} from 'react-native-indicators';
 
 i18n.fallbacks = true;
 i18n.translations = { homeScreenEn, homeScreenAr };
@@ -29,10 +34,10 @@ const LATITUDE_DELTA = 0.016;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
 
-export  class HomeScreen extends React.Component {
+export class HomeScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     return {
-      title: 'HOME',
+      title: navigation.getParam('Title', 'Home'),
       headerTintColor: '#ffffff',
       headerStyle: {
         backgroundColor: Colors.appTheme,
@@ -44,10 +49,10 @@ export  class HomeScreen extends React.Component {
           },
         }),
       },
-
+      
       headerRight: <NavigationBarButton name={Platform.OS === 'ios' ? 'md-cart' : 'md-cart'} onPress={() => navigation.navigate('Cart')} />,
-      headerLeft: <NavigationBarButton name={Platform.OS === 'ios' ? 'md-menu' : 'md-menu'} onPress={() => navigation.navigate('Scanner')} />
-      // header: null
+      headerLeft: <NavigationBarButton name={Platform.OS === 'ios' ? 'md-menu' : 'md-menu'} onPress={() => navigation.navigate('Scanner')} />,
+      ...navigation.getParam('navBarHidden',  false) ? {header: null} : {},
     };
   };
 
@@ -59,44 +64,70 @@ export  class HomeScreen extends React.Component {
         longitude: 67.29881,
         latitudeDelta: LATITUDE_DELTA,
         longitudeDelta: LONGITUDE_DELTA,
-      }
+      },
     };
+  }
+
+  componentDidUpdate() {
+    
+  }
+
+  componentWillMount() {
+    if (UIManager.setLayoutAnimationEnabledExperimental){
+      UIManager.setLayoutAnimationEnabledExperimental(true);
+    }
+    this._showSearching(true);
   }
 
   componentDidMount() {
     this._getLocationAsync();
   }
 
-  async _getLocationAsync(){
+  async _getLocationAsync() {
     let { status } = await Permissions.askAsync(Permissions.LOCATION);
     if (status !== 'granted') {
-      this.setState({locationResult: 'Permission to access location was denied',});
+      this.setState({ locationResult: 'Permission to access location was denied', });
     }
     let location = await Location.getCurrentPositionAsync({});
-    this.setState({ region: {
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude,
-      latitudeDelta: LATITUDE_DELTA,
-      longitudeDelta: LONGITUDE_DELTA,
-    }});
-    this.map.animateToRegion(this.state.region, 100)
-  };
-
-  goToCurrentLocation(){
-    let response = Location.getCurrentPositionAsync();
-    response.then(location => {
-      console.log(JSON.stringify(location));
-      this.setState({ region: {
+    this.setState({
+      region: {
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
         latitudeDelta: LATITUDE_DELTA,
         longitudeDelta: LONGITUDE_DELTA,
-      }});
-      this.map.animateToRegion(this.state.region, 100)
-    })
+      }
+    });
+    this.map.animateToRegion(this.state.region, 100)
+  };
+
+  goToCurrentLocation() {
+    // let response = Location.getCurrentPositionAsync();
+    // response.then(location => {
+    //   console.log(JSON.stringify(location));
+    //   this.setState({
+    //     region: {
+    //       latitude: location.coords.latitude,
+    //       longitude: location.coords.longitude,
+    //       latitudeDelta: LATITUDE_DELTA,
+    //       longitudeDelta: LONGITUDE_DELTA,
+    //     }
+    //   });
+    //   this.map.animateToRegion(this.state.region, 100)
+    // })
+    // console.log(this.props)
+    // this.props.navigation.setParams({Title: 'Sky Blue Activity'});
+    this._showSearching(true)
+  }
+
+  _showSearching(isHidden){
+    LayoutAnimation.easeInEaseOut();
+    this.setState({ isSearching: isHidden });
+    
+    this.props.navigation.setParams({navBarHidden: isHidden});
   }
 
   render() {
+    let { active } = this.state;
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.mapView}>
@@ -106,31 +137,39 @@ export  class HomeScreen extends React.Component {
             provider={PROVIDER_GOOGLE}
             showsUserLocation={true}
             followsUserLocation={true}
-            loadingEnabled= {true}
+            loadingEnabled={true}
             customMapStyle={customStyle}
             initialRegion={this.state.region}
             // onRegionChange={}
             userLocationAnnotationTitle={'You'}
           />
         </View>
-        <View style={styles.tabBarInfoContainer}>
+        {!this.state.isSearching && <View style={styles.tabBarInfoContainer}>
           <TouchableOpacity
             style={styles.button} onPress={() => this.goToCurrentLocation()} activeOpacity={0.6}>
             <Icon.MaterialIcons
               name={'my-location'}
               size={28}
-              color={'white'}/>
-            <Text style={styles.buttonText}>{i18n.t(homeScreenEn["My Location"])}</Text>
+              color={'white'} />
+            <Text style={styles.buttonText}>{"My Location"}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.button} onPress={() => this.props.navigation.navigate('Services')} activeOpacity={0.6}>
-              <Icon.MaterialIcons
+            <Icon.MaterialIcons
               name={'format-list-bulleted'}
               size={28}
-              color={'white'}/>
-            <Text style={styles.buttonText}>{i18n.t(homeScreenEn.Services)}</Text>
+              color={'white'} />
+            <Text style={styles.buttonText}>{'Services'}</Text>
           </TouchableOpacity>
-        </View>
+        </View>}
+        {this.state.isSearching && <View style={{ height: '100%', width: '100%', position: 'absolute', alignItems: 'center', justifyContent: 'center' }}>
+          <WaveIndicator color={Colors.appTheme} size={Dimensions.get('window').width * 0.9} animationDuration={800} count={1} />
+          <View style={{ alignItems: 'center', width: '100%', marginBottom: 20 }}>
+            <TouchableOpacity style={[styles.simplebutton, { backgroundColor: Colors.red, marginBottom: 8 }]} onPress={() => this._showSearching(false)} activeOpacity={0.8}>
+              <Text style={[styles.simplebuttonText, { color: 'white' }]}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>}
       </SafeAreaView>
     );
   }
@@ -148,7 +187,7 @@ const styles = StyleSheet.create({
     right: 0,
     // bottom: 55,
     flex: 1,
-    
+
   },
   tabBarInfoContainer: {
     // position: 'relative',
@@ -172,13 +211,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row'
   },
   button: {
-    alignSelf : 'center',
+    alignSelf: 'center',
     alignItems: 'center',
     marginHorizontal: 15,
     justifyContent: 'center',
     flexDirection: 'row',
     height: '100%',
-    width: Dimensions.get('screen').width/2 - 30
+    width: Dimensions.get('screen').width / 2 - 30
   },
   buttonText: {
     marginHorizontal: 5,
@@ -186,7 +225,21 @@ const styles = StyleSheet.create({
     padding: 8,
     fontSize: 18,
     color: 'white'
-  }
+  },
+  simplebutton: {
+    alignItems: 'center',
+    marginHorizontal: 15,
+    marginVertical: 10,
+    height: 50,
+    borderRadius: 5,
+    justifyContent: 'center',
+    width: 240,
+  },
+  simplebuttonText: {
+    textAlign: 'center',
+    padding: 8,
+    fontSize: 18,
+  },
 });
 
 

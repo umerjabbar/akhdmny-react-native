@@ -4,8 +4,8 @@ import { AppLoading, Asset, Font, Icon, Localization, Updates } from 'expo';
 import AppNavigator from './navigation/AppNavigator';
 import FlashMessage from "react-native-flash-message";
 
-I18nManager.allowRTL(true);
-// I18nManager.forceRTL(true);
+I18nManager.isRTL = Localization.isRTL  
+// I18nManager.forceRTL(false);
 
 export default class App extends React.Component {
   state = {
